@@ -1,0 +1,138 @@
+[
+  {
+    "id": 1, "name": "MADNESS", "cnName": "疯狂", "stationCount": 13, "turnGoal": 120,
+    "source": "https://limbuscompany.wiki.gg/wiki/Line_1:_MADNESS",
+    "summary": "最初的直线型轨道线。固定 5 人出战，13 站连续推进，以单体 Boss 与剧情敌人强化版为主。",
+    "globalMechanics": ["全线携带 5 名罪人", "人格与 E.G.O 在进入后固定", "以总回合数作为核心记录指标"],
+    "stations": [
+      {"no":1,"name":"接触 / Contact","boss":"腐化 G 公司部长与士兵","type":"普通战","mechanics":["两波战斗","优先清理会回复与施加虫群效果的单位"]},
+      {"no":2,"name":"复原 / Restoration","boss":"Aida、Los Mariachis、铁球帮","type":"普通战","mechanics":["两波战斗","Aida 高速闪避，建议保留高点数技能收尾"]},
+      {"no":3,"name":"沉降 / Sinkage","boss":"Blubbering Toad（蛤蟆）","type":"幻想体","mechanics":["眼部是主要机制部位","哭泣会压低理智值；尽快破眼降低压力"]},
+      {"no":4,"name":"重逢 / Reunion","boss":"Guido 与 N 公司审判官","type":"普通战","mechanics":["两波战斗","钉与狂信机制；避免让脆弱角色承受集火"]},
+      {"no":5,"name":"绝缘 / Insulation","boss":"Alleyway Watchdog（巷弄看门犬）","type":"幻想体","mechanics":["电线杆/身体部位联动","蓄电后攻击增强，破坏关键部位打断循环"]},
+      {"no":6,"name":"拾取 / Pickup","boss":"kqe-1j-23","type":"幻想体","mechanics":["抓取罪人并进行处决倒计时","优先打断抓取部位、救出被捕获单位"]},
+      {"no":7,"name":"无头 / Headlessness","boss":"Headless Ichthys（无头鱼）","type":"幻想体","mechanics":["血袋部位提供爆发窗口","注意高额流血；破坏部位后集中本体"]},
+      {"no":8,"name":"存在 / Existence","boss":"Everything There of an Inquisitor","type":"普通战","mechanics":["会模仿/改变抗性","先清理随从，按当前抗性切换伤害类型"]},
+      {"no":9,"name":"血清 / Serum","boss":"K 公司检查站与三级职员","type":"普通战","mechanics":["三波战斗","K 安瓿带来强回复，单回合集中击杀避免反复回血"]},
+      {"no":10,"name":"分叉舌 / Forked Tongue","boss":"Slithering Inquisitor 与四足兽","type":"普通战","mechanics":["多目标压力","控制流血层数并优先减少敌方行动槽"]},
+      {"no":11,"name":"通电 / Energization","boss":"看门犬 + 无头鱼","type":"幻想体","mechanics":["双 Boss 同场","优先击破可快速制造混乱的目标，避免平均压血"]},
+      {"no":12,"name":"纯洁 / Purity","boss":"Kromer","type":"Boss","mechanics":["两阶段形态","流血/烧伤队需注意其条件强化；保留资源处理第二阶段"]},
+      {"no":13,"name":"非我 / Non-self","boss":"My Form Empties（空即是色）","type":"终点 Boss","mechanics":["本体与被诱惑的领袖联动","按标记/业力顺序处理单位，错误击杀顺序会延长战斗"]}
+    ]
+  },
+  {
+    "id": 2, "name": "Möbius", "cnName": "莫比乌斯", "stationCount": 9, "turnGoal": 150,
+    "source": "https://limbuscompany.wiki.gg/wiki/Line_2:_M%C3%B6bius",
+    "summary": "环线型轨道线。重复循环解锁车站与增益，第一轮后随时可进入终点；低回合轴同时需要规划循环数。",
+    "globalMechanics": ["最多 7 人出战，少带人不增加技能槽", "每次回到起点增加循环数并解锁车站", "循环时选择一项我方增益与敌方增益", "第一轮后可进入终点站结束"],
+    "stations": [
+      {"no":1,"name":"诅咒 / Curse","boss":"So That No One Will Cry（无人哭泣）","type":"幻想体","mechanics":["护符会在双方间转移并叠层","控制护符数量，利用阈值制造破绽"]},
+      {"no":2,"name":"劳役 / Servitude","boss":"Steam Transport Machine（蒸汽运输机器）","type":"幻想体","mechanics":["蒸汽层数影响攻防与抗性","在排气/低防窗口爆发，避免拖入高压循环"]},
+      {"no":3,"name":"降雨 / Rainfall","boss":"Drifting Fox（漂泊狐狸）","type":"幻想体","mechanics":["伞部位与沉沦/破裂压力","清伞后获得输出窗口，注意理智值维持"]},
+      {"no":4,"name":"欠款 / Arrears","boss":"T 公司三级收税员","type":"普通战","mechanics":["循环 3 后敌人数由 2 增至 4","时间与震颤效果拖延节奏，优先减员"]},
+      {"no":5,"name":"诱饵 / The Lure","boss":"Faelantern（妖精提灯）","type":"幻想体","mechanics":["先攻击诱饵/妖精才可稳定触及本体","被魅惑单位会改变目标，注意速度顺序"]},
+      {"no":6,"name":"榨取 / Exploitation","boss":"Shock Centipede（电击蜈蚣）","type":"幻想体","mechanics":["自充电并以电量维持存活","先耗尽电量再击杀，避免在带电状态浪费爆发"]},
+      {"no":7,"name":"异臭 / Odd Stench","boss":"Fairy Gentleman + Fairy-Long-Legs","type":"幻想体","mechanics":["第五循环为双 Boss","酒/妖精酒机制会放大伤害；明确集火顺序"]},
+      {"no":8,"name":"循环 / Cycle","boss":"Wayward Passenger（迷途乘客）","type":"幻想体","mechanics":["撕开次元门并标记单位","及时破坏传送门，防止单位被隔离/处决"]},
+      {"no":9,"name":"花园 / The Garden","boss":"Sign of Roses（蔷薇标牌）","type":"终点 Boss","mechanics":["生成对应七罪颜色的蔷薇","按队伍罪孽属性处理花朵；未及时击破会引爆"]}
+    ]
+  },
+  {
+    "id": 3, "name": "MirrorClock OrangeRoad", "cnName": "镜时钟橙路", "stationCount": 13, "turnGoal": 100,
+    "source": "https://limbuscompany.wiki.gg/wiki/Line_3:_MirrorClock_OrangeRoad",
+    "summary": "十三站环形路线，含 3 个休息站。最多 6 人出战，可回溯至已通过车站，但后续进度会被重置。",
+    "globalMechanics": ["最多 6 人出战", "4/8/12 站为休息站，可回血复活并更换人格/E.G.O", "可回溯到已完成站点，之后进度重置"],
+    "stations": [
+      {"no":1,"name":"齿轮 / Cogwheel","boss":"多孔手鲸人鱼","type":"普通战","mechanics":["多波人鱼战","优先减少行动槽；留意苍白化相关效果"]},
+      {"no":2,"name":"波涛 / Waves","boss":"Dream-Devouring Siltcurrent（吞梦鲶鱼）","type":"幻想体","mechanics":["荧光灯与盲目机制","按顺序击破灯部位，规避高威力全体攻击"]},
+      {"no":3,"name":"乡愁 / Nostalgia","boss":"Drenched Gossypium（浸透棉花）","type":"幻想体","mechanics":["强制赋予流血与棉花效果","混乱后会取消混乱并转化为增益，规划一回合爆发"]},
+      {"no":4,"name":"幕间 / Interlude","boss":"休息站","type":"休息","mechanics":["恢复/复活","可调整人格与 E.G.O"]},
+      {"no":5,"name":"苦役 / Drudgery","boss":"Ambling Pearl（踱步珍珠）","type":"幻想体","mechanics":["黏液与蛆虫部位循环","清理召唤物并破壳，污染过高时敌方强化"]},
+      {"no":6,"name":"真理 / Truth","boss":"Skin Prophet（皮肤先知）","type":"幻想体","mechanics":["蜡烛决定本体保护状态","先灭烛再攻击本体，规划广域技能缩短流程"]},
+      {"no":7,"name":"羽化 / Eclosion","boss":"Ardor Blossom Moth（炽热花蛾）","type":"幻想体","mechanics":["火种与烧伤扩散","破翼/控制火种，避免烧伤在队伍中滚高"]},
+      {"no":8,"name":"幕间 / Interlude","boss":"休息站","type":"休息","mechanics":["恢复/复活","可调整人格与 E.G.O"]},
+      {"no":9,"name":"苍白化 / Pallidification","boss":"苍白人鱼群","type":"普通战","mechanics":["多波次并施加苍白化","快速减员，避免状态累积后失控"]},
+      {"no":10,"name":"洗脑 / Brainwash","boss":"Ahab 与裴廓德号船员","type":"Boss","mechanics":["Ahab 通过标记引导全队集火","先处理保护链/船员，再集中 Ahab"]},
+      {"no":11,"name":"煤气灯 / Gaslight","boss":"盛放 E.G.O::GasHarpoon","type":"Boss","mechanics":["三阶段切换人格化能力","每阶段抗性与关键技能不同，保留资源跨阶段"]},
+      {"no":12,"name":"幕间 / Interlude","boss":"休息站","type":"休息","mechanics":["最终整备","负理智值重置为 0"]},
+      {"no":13,"name":"螺旋 / Spiral","boss":"Spiral of Contempt（轻蔑螺旋）","type":"终点 Boss","mechanics":["注视/轻蔑标记与凝视层数","利用被标记者完成事件窗口，处理手臂后爆发本体"]}
+    ]
+  },
+  {
+    "id": 4, "name": "Masquerade", "cnName": "折射轨道4号线", "stationCount": 13, "sectionCount": 4, "battleFormat": "continuous-sections", "turnGoal": 100,
+    "source": "https://limbuscompany.huijiwiki.com/wiki/折射轨道4号线", "englishSource": "https://limbuscompany.wiki.gg/wiki/Line_4:_Masquerade",
+    "summary": "四区段链式战斗。每区段内车站视为连续波次，并首次引入 12 人链式替补与嫉妒罪种人格/E.G.O 模仿。",
+    "globalMechanics": ["12 人链式战斗，前 6 人首发，死亡后按顺序替补", "每个部署位带固定增益", "区段内多个车站视作连续波次", "嫉妒罪种会使用对应人格、被动与 E.G.O 资源"],
+    "deploymentRules": {"size":12,"frontline":6,"restrictions":[]},
+    "deploymentBuffs": [{"position":1,"label":"人格等级 +2","level":2},{"position":2,"label":"理智值恢复效率 +3；入场理智值 +10","entrySp":10},{"position":3,"label":"攻击等级 +2","offenseLevel":2},{"position":4,"label":"防御等级 +2","defenseLevel":2},{"position":5,"label":"速度上限 +2","maxSpeed":2},{"position":6,"label":"最大 HP +5%","maxHpPercent":5},{"position":7,"label":"拼点威力 +1；入场理智值 +15","clashPower":1,"entrySp":15},{"position":8,"label":"受到伤害 -10%；入场理智值 +15","damageTakenPercent":-10,"entrySp":15},{"position":9,"label":"仇恨值 +5；入场理智值 +20","aggro":5,"entrySp":20},{"position":10,"label":"造成伤害 +10%；入场理智值 +20","damageDealtPercent":10,"entrySp":20},{"position":11,"label":"最终威力 +1；入场理智值 +30","finalPower":1,"entrySp":30},{"position":12,"label":"人格等级 +3；入场理智值 +30","level":3,"entrySp":30}],
+    "sectionTransitions": [
+      {"toSection":2,"egoResources":"carry","hpSpSource":"full-hp-zero-sp","canChangeTeam":true},
+      {"toSection":3,"egoResources":"carry","hpSpSource":"full-hp-zero-sp","canChangeTeam":true},
+      {"toSection":4,"egoResources":"carry","hpSpSource":"full-hp-zero-sp","canChangeTeam":true}
+    ],
+    "stations": [
+      {"no":1,"section":1,"name":"宴会 / Banquet","boss":"折射的某日的肖像 / Refracted Portrait of a Certain Day","type":"幻想体","mechanics":["肖像与本体真假识别","观察状态/技能提示攻击正确肖像，错误目标会受惩罚"]},
+      {"no":2,"section":1,"name":"井底 / Well Basin","boss":"折射的约瑟芬 → 折射的因被夺取而哭嚎的亨德利 / Refracted Josephine → Refracted Hindley, The Reaved Lamenter","type":"Boss","mechanics":["连续波次","先清管家，再处理悲叹 Hindley 的反击/高威力技能"]},
+      {"no":3,"section":1,"name":"歪曲 / Twisted","boss":"折射的耐莉 / Refracted Nelly","type":"Boss","mechanics":["闪避与反击压力","留高点技能压过防御，注意区段末资源状态"]},
+      {"no":4,"name":"幕间 / Interlude","boss":"休息站","type":"休息","mechanics":["重置 HP/SP","调整链式顺序与 E.G.O"]},
+      {"no":5,"section":2,"name":"锤钉 / Chiseling","boss":"嫉妒罪种·N 公司世界","type":"嫉妒罪种","mechanics":["会使用 N 公司人格与 E.G.O","可查看敌方资源；优先击杀能释放高危 E.G.O 的单位"]},
+      {"no":6,"section":2,"name":"云雾 / Cloudbrume","boss":"折射的黑云会副会长 俊 / Refracted Kurokumo Clan Captain Jun","type":"Boss","mechanics":["反击技能可造成致命连锁","以单方面攻击/防御技能规避高额反击"]},
+      {"no":7,"section":2,"name":"骨肉 / Boneflesh","boss":"嫉妒罪种·剑契世界","type":"嫉妒罪种","mechanics":["剑契梅尔索与呼吸/反击体系","控制其三技能与骨断触发窗口"]},
+      {"no":8,"name":"幕间 / Interlude","boss":"休息站","type":"休息","mechanics":["重置 HP/SP","调整阵容"]},
+      {"no":9,"section":3,"name":"赝作 / Forgery","boss":"嫉妒罪种·混合三星人格","type":"嫉妒罪种","mechanics":["高强度混合队与 E.G.O","按敌方资源预测 E.G.O，优先减员"]},
+      {"no":10,"section":3,"name":"梦想 / Dreaming","boss":"折射的梦中的电子羊 / Refracted Dreaming Electric Sheep","type":"幻想体","mechanics":["插头与充能联动","按事件要求连接/断开部位，阻止蓄电后的高威力攻击"]},
+      {"no":11,"name":"幕间 / Interlude","boss":"休息站","type":"休息","mechanics":["最终整备","重排首发与替补"]},
+      {"no":12,"section":4,"name":"难关 / Adamantine Wall","boss":"嫉妒罪种·沉沦/庄园世界","type":"嫉妒罪种","mechanics":["沉沦队与管家/Cinq 人格组合","保护理智值，优先处理水袋等恢复 E.G.O 使用者"]},
+      {"no":13,"section":4,"name":"盛宴 / Feast","boss":"折射的受缚之王 / The Refracted King in Binds","type":"终点 Boss","mechanics":["王座/臣下与束缚层数联动","利用速度和束缚条件完成机制，混乱窗口集中爆发"]}
+    ]
+  },
+  {
+    "id": 5, "name": "Merry Go Round", "cnName": "折射轨道5号线", "stationCount": 11, "sectionCount": 3, "battleFormat": "continuous-sections", "turnGoal": 100,
+    "source": "https://limbuscompany.huijiwiki.com/wiki/折射轨道5号线", "englishSource": "https://limbuscompany.wiki.gg/wiki/Line_5:_Merry_Go_Round",
+    "summary": "三个连续战区段，共 11 个站点；同一区段内的站点是同一场遭遇的连续波次，不是 11 场独立战斗。第一、二区段必须使用两套不同人格，E.G.O 资源共享。",
+    "globalMechanics": ["一区使用过的人格在二区锁定，需要两套 12 人队伍", "E.G.O 资源跨区段保留", "三区两队合流并重置 HP/SP", "每站后选择永久增益与配套苦难"],
+    "deploymentRules": {"size":12,"frontline":6,"restrictions":[{"section":2,"excludeSection":1}]},
+    "recordRules": {"type":"buff-trials","stations":[1,2,3,4,5,6,7,8,9,10],"buffNames":["施加量折射","获得量折射","折射的理智","折射的爆发","折射的破裂","折射的沉沦","折射的呼吸法","折射的充能","折射的流血","弱点破坏","雾化吸入器","一息","延续斗志","资源收获","生死决断","愤怒的反击","体力扭曲","染血宴会","孤独的射手","追忆吊坠","凶弹倾泻","血之庆典","顽强防御","威力轮盘","折射的暴怒","折射的色欲","折射的怠惰","折射的暴食","折射的忧郁","折射的傲慢","折射的嫉妒","折射的斩击","折射的突刺","折射的打击","高风险","安乐"],"buffEnglishNames":["Infliction Refraction","Gain Refraction","Refracted Mind","Refracted Burst","Refracted Rupture","Refracted Sinking","Refracted Poise","Refracted Charge","Refracted Bleed","Weakness Destroyed","Nebulizer","A Single Breath","Lasting Battle Spirit","Resource Reaping","Life or Death","Wrathful Counter","HP Manipulation","Bloody Banquet","The Lone Gunman","Pendant of Nostalgia","Fell Bullet Deluge","Festival of Blood","Dogged Defense","Power Roulette","Refracted Wrath","Refracted Lust","Refracted Sloth","Refracted Gluttony","Refracted Gloom","Refracted Pride","Refracted Envy","Refracted Slash","Refracted Pierce","Refracted Blunt","High-risk","Comfy"],"trialNames":["成长折射 I","绽放之血","成长折射 II","拼点威力折射","资源挥发","生死决断","折射的愤怒","体力折射","伤害折射","顽强防御","威力轮盘","攻击性折射","中等风险","高风险","防御折射"],"trialEnglishNames":["Growth Refraction I","Blossomed Blood","Growth Refraction II","Clash Power Refraction","Resource Vaporization","Life or Death","Refracted Rage","Health Refraction","Damage Refraction","Dogged Defense","Power Roulette","Hostile Refraction","Moderate Risk","High-risk","Defensive Refraction"],"stationPools":{"1":{"buffs":["施加量折射","获得量折射","折射的理智"],"trials":["成长折射 I"]},"2":{"buffs":["施加量折射","获得量折射","折射的理智","折射的爆发","折射的破裂","折射的沉沦","折射的呼吸法","折射的充能","折射的流血"],"trials":["成长折射 I","绽放之血"]},"3":{"buffs":["施加量折射","获得量折射","折射的理智","折射的爆发","折射的破裂","折射的沉沦","折射的呼吸法","折射的充能","折射的流血"],"trials":["成长折射 I","绽放之血"]},"4":{"buffs":["弱点破坏","雾化吸入器","一息"],"trials":["成长折射 I","成长折射 II"]},"5":{"buffs":["延续斗志","资源收获","生死决断","愤怒的反击","体力扭曲","染血宴会"],"trials":["拼点威力折射","资源挥发","生死决断","折射的愤怒","体力折射"]},"6":{"buffs":["延续斗志","资源收获","生死决断","愤怒的反击","体力扭曲","染血宴会"],"trials":["拼点威力折射","资源挥发","生死决断","折射的愤怒","体力折射"]},"7":{"buffs":["孤独的射手","追忆吊坠","凶弹倾泻","血之庆典"],"trials":["伤害折射"]},"8":{"buffs":["施加量折射","获得量折射","折射的理智","折射的爆发","折射的破裂","折射的沉沦","折射的呼吸法","折射的充能","折射的流血","延续斗志","资源收获","生死决断","愤怒的反击","体力扭曲","染血宴会","顽强防御","威力轮盘","折射的暴怒","折射的色欲","折射的怠惰","折射的暴食","折射的忧郁","折射的傲慢","折射的嫉妒"],"trials":["成长折射 I","绽放之血","拼点威力折射","资源挥发","生死决断","折射的愤怒","体力折射","顽强防御","威力轮盘","攻击性折射"]},"9":{"buffs":["施加量折射","获得量折射","折射的理智","折射的爆发","折射的破裂","折射的沉沦","折射的呼吸法","折射的充能","折射的流血","延续斗志","资源收获","生死决断","愤怒的反击","体力扭曲","染血宴会","顽强防御","威力轮盘","折射的暴怒","折射的色欲","折射的怠惰","折射的暴食","折射的忧郁","折射的傲慢","折射的嫉妒"],"trials":["成长折射 I","绽放之血","拼点威力折射","资源挥发","生死决断","折射的愤怒","体力折射","顽强防御","威力轮盘","攻击性折射"]},"10":{"buffs":["折射的斩击","折射的突刺","折射的打击","高风险","安乐"],"trials":["中等风险","高风险","防御折射"]}}},
+    "sectionTransitions": [
+      {"toSection":2,"egoResources":"carry","hpSpSource":"full-hp-zero-sp","canChangeTeam":true},
+      {"toSection":3,"egoResources":"carry","hpSpSource":"full-hp-zero-sp","canChangeTeam":true}
+    ],
+    "stations": [
+      {"no":1,"section":1,"name":"依恋 / Attachment","boss":"折射的痛苦泰迪 / Refracted Hurting Teddy Bear","type":"幻想体","mechanics":["拥抱标记与缝合部位","避免同一单位反复承受拥抱，破坏手臂制造窗口"]},
+      {"no":2,"section":1,"name":"狩猎 / Hunt","boss":"折射的玫瑰猎人 / Refracted Rose Hunter","type":"幻想体","mechanics":["召唤/锁定目标并追猎","处理藤蔓或狩猎目标，阻止强化追击"]},
+      {"no":3,"section":1,"name":"源头 / Fountainhead","boss":"折射的怠惰/忧郁/暴怒罪种3型 / Refracted Class 3 Peccatula","type":"罪种","mechanics":["怠惰/忧郁/暴怒罪种组合","按抗性与技能威胁集中减员"]},
+      {"no":4,"section":1,"name":"喷雾 / Misting","boss":"折射的往昔的睡袋 / Refracted Sleeping Bag of a Bygone Day","type":"幻想体","mechanics":["睡眠与理智值机制","唤醒/击破关键部位，避免多人同时失去行动"]},
+      {"no":5,"section":2,"name":"击锤 / Ironstrike","boss":"折射的嫉妒罪种2型（弹药人格） / Refracted Peccatulum Invidiae Type 2","type":"嫉妒罪种","mechanics":["满停办/弹药队开局爆发高","用耐性/防御接首轮，弹药耗尽后反击"]},
+      {"no":6,"section":2,"name":"狂奔 / Rampage","boss":"折射的嫉妒罪种2型（黑云会/中指/E.G.O） / Refracted Peccatulum Invidiae Type 2","type":"嫉妒罪种","mechanics":["流血与复仇标记联动","避免触发集中反击，观察敌方 E.G.O 资源"]},
+      {"no":7,"section":2,"name":"忘却 / Oblivion","boss":"折射的凶弹射手 / Refracted Der Fluchschütze","type":"幻想体","mechanics":["子弹按回合与目标累积","利用替补和部位破坏控制第七发高危攻击"]},
+      {"no":8,"section":3,"name":"母性 / Motherhood","boss":"折射的杜尔西内娅 / Refracted Dulcinea","type":"Boss","mechanics":["眷属与血宴强化","先削弱随从/保护链，再集中 Dulcinea"]},
+      {"no":9,"section":3,"name":"反叛 / Treason","boss":"折射的嫉妒罪种2型（拉曼查/流血人格） / Refracted Peccatulum Invidiae Type 2","type":"嫉妒罪种","mechanics":["血餐与流血人格协同","限制流血层数，优先击杀核心增益者"]},
+      {"no":10,"section":3,"name":"血罪 / Blood Sin","boss":"折射的神父 + 折射的理发师 + 折射的杜尔西内娅 / The Refracted Priest, The Refracted Barber & Refracted Dulcinea","type":"Boss","mechanics":["三 Boss 连携与血餐共享","明确击杀顺序，避免同时压低触发多套强化"]},
+      {"no":11,"section":3,"name":"渴望 / Yearning","boss":"折射的四百朵玫瑰 / Refracted Four-hundred Roses","type":"终点 Boss","mechanics":["血系花朵与流血资源联动","清理花朵、控制流血，选择的最终增益会改变其物理抗性"]}
+    ]
+  },
+  {
+    "id": 6, "name": "Maru no Uchi no Sanzu no Kawa", "cnName": "折射轨道6号线", "stationCount": 8, "sectionCount": 5, "battleFormat": "continuous-sections", "turnGoal": 111,
+    "source": "https://limbuscompany.huijiwiki.com/wiki/折射轨道6号线", "englishSource": "https://limbuscompany.wiki.gg/wiki/Line_6:_Maru_no_Uchi_no_Sanzu_no_Kawa",
+    "summary": "五个连续战区段，共 8 个站点；各区段才是完整战斗单位。三区、四区会禁用前一区段部署的人格；首战蝴蝶选择影响中段敌人抗性，三只幻蝶事件会削弱终战机制。",
+    "globalMechanics": ["三区与四区禁用前一区段已部署人格", "进入新区段通常复活、回满 HP 并将 SP 归零", "第五区继承第一区结束时的 HP 百分比与 SP", "首站影响 2～4 区敌方抗性；幻蝶事件可关闭终战被动", "整条线路可发动2次不同的光之树苗能力：宗教层、哲学层、社会科学层、语言层"],
+    "deploymentRules": {"size":12,"frontline":7,"restrictions":[{"section":3,"excludeSection":2},{"section":4,"excludeSection":3}]},
+    "recordRules": {"type":"butterfly-choices","saplingOfLight":{"label":"光之树苗能力 / Golden Bough Ability","maxUses":2,"uniquePerAbility":true,"source":"https://limbuscompany.huijiwiki.com/wiki/光之树苗能力","abilities":[{"id":"pigritia","name":"PIGRITIA","floor":"宗教层 / Religion","effect":"发动回合全体敌方单位当前速度值减半（向下取整）；技能目标重置，回合开始效果不会更新","duration":1},{"id":"superbia","name":"SUPERBIA","floor":"哲学层 / Philosophy","effect":"发动回合可生成并使用1次不消耗罪孽资源的E.G.O技能；理智值消耗不变","duration":1},{"id":"morositas","name":"MOROSITAS","floor":"社会科学层 / Social Sciences","effect":"发动起3回合内全体单位基础攻击等级与基础防御等级调整为全体单位平均值；我方额外攻击等级+3、防御等级+6","duration":3,"allyOffenseLevel":3,"allyDefenseLevel":6},{"id":"ira","name":"IRA","floor":"语言层 / Language","effect":"发动回合选择1名可行动罪人：基础攻击/反击伤害+100%，加算硬币威力+1，减算最终威力+1，硬币不可摧毁；免疫混乱、体力不低于10，命中恢复伤害量10%的体力（每技能最多100）","duration":1}]},"resistanceModifier":0.25,"resistanceSections":[2,3,4],"attackTypes":["Slash","Pierce","Blunt"],"affinities":["Wrath","Lust","Sloth","Gluttony","Gloom","Pride","Envy"],"sealEvents":[{"key":"past","afterSection":2,"label":"罗生蝶幻影::过去","options":[{"id":"past-1","label":"选项1","effect":"禁用：罗生蝶受到罪人攻击时，使罪人增加烧伤强度并施加烧伤层数"},{"id":"past-2","label":"选项2","effect":"禁用：过去状态专用技能“劫火”的最终威力增加，最后一枚硬币命中时造成理智伤害"},{"id":"past-3","label":"选项3","effect":"禁用：对烧伤达到一定层数的罪人施加体力恢复效率降低与暴怒易损"}]},{"key":"present","afterSection":3,"label":"罗生蝶幻影::现在","options":[{"id":"present-1","label":"选项1","effect":"禁用：暴击命中时呼吸法层数不会减少，回合开始时呼吸法强度与层数大幅增加"},{"id":"present-2","label":"选项2","effect":"禁用：现在状态专用技能“破邪”的最终威力增加，最后一枚硬币命中时使目标的混乱阈值前移"},{"id":"present-3","label":"选项3","effect":"禁用：依据呼吸法强度与层数提高暴击伤害"}]},{"key":"future","afterSection":4,"label":"罗生蝶幻影::未来","options":[{"id":"future-1","label":"选项1","effect":"禁用：回合开始时对全体罪人施加流血层数"},{"id":"future-2","label":"选项2","effect":"禁用：未来状态专用技能“血花”的最终威力增加，最后一枚硬币命中时使自身恢复体力"},{"id":"future-3","label":"选项3","effect":"禁用：自身或罪人触发流血时罗生蝶恢复体力"}]}],"wayfarerEvents":[{"section":3,"label":"第三区·“玩吗？”第一回合开始时","variant":"standard","startTurn":1},{"section":4,"label":"第四区·里恩战斗事件","variant":"standard","requiresStartTurn":true,"manualTrigger":true},{"section":5,"label":"第五区·首次使用“劫火/破邪/血花”后的事件","variant":"final","requiresStartTurn":true,"manualTrigger":true}],"wayfarerOptions":{"standard":[{"id":"sap","label":"喝下树液，好好休息会然后离开。","effect":"敌我体力上限+50%（最多200，不包括嫉妒罪种），移除第一混乱阈值"},{"id":"moth","label":"稍作休息后，与蝴蝶们一同出发。","effect":"敌我按场上同阵营友方单位数获得攻击等级提升（最多4层）"},{"id":"refuse","label":"匆匆离开。","effect":"什么都没有发生"}],"final":[{"id":"sap","label":"喝下树液，好好休息会然后离开。","effect":"我方体力上限+50%（最多200，不包括嫉妒罪种），移除第一混乱阈值；回合结束时使理智值最低的4名友方单位恢复4点理智值"},{"id":"moth","label":"稍作休息后，与蝴蝶们一同出发。","effect":"按本场战斗阵亡友方单位数获得攻击等级提升（最多6层）；参与完全共鸣的技能造成的伤害+20%"},{"id":"refuse","label":"匆匆离开。","effect":"什么都没有发生"}]}}, 
+    "sectionTransitions": [
+      {"toSection":2,"egoResources":"carry","hpSpSource":"full-hp-zero-sp","canChangeTeam":true},
+      {"toSection":3,"egoResources":"carry","hpSpSource":"full-hp-zero-sp","canChangeTeam":true},
+      {"toSection":4,"egoResources":"carry","hpSpSource":"full-hp-zero-sp","canChangeTeam":true},
+      {"toSection":5,"egoResources":"carry","hpSpSource":"section-1-clear","canChangeTeam":true}
+    ],
+    "stations": [
+      {"no":1,"section":1,"name":"悬衣 / Weighing of Robes","boss":"折射的罗生蝶::蛹 / Refracted Butterfly of Entangled Lives::The Pupa","type":"幻想体","mechanics":["战斗选择会改变后续三区敌人的抗性","记录最终抗性选择；本区结束状态会被第五区继承"]},
+      {"no":2,"section":2,"name":"染污 / Tarnishing","boss":"折射的应龙 / Refracted Yinglong + 折射的嫉妒罪种2型（H公司） / Refracted Peccatulum Invidiae Type 2","type":"Boss","mechanics":["应龙与 H 公司人格连续波次","区末幻蝶事件可封印终战一项被动"]},
+      {"no":3,"section":3,"name":"童心 / Heart of Innocence","boss":"折射的玩吗？ / Refracted Will You Play? + 折射的嫉妒罪种2型（中指） / Refracted Peccatulum Invidiae Type 2","type":"幻想体","mechanics":["禁用二区部署人格","游戏/玩具规则与中指反击叠加；区末选择封印被动"]},
+      {"no":4,"section":3,"name":"现象 / Face of Things","boss":"折射的扭曲的霍恩海姆 / Refracted Distorted Hohenheim","type":"Boss","mechanics":["与上一站同属连续区段","注意扭曲阶段转换和无法恢复的区段资源压力"]},
+      {"no":5,"section":4,"name":"盘错 / Tangled Knots","boss":"折射的小指 父辈 - 盐见夜 / Refracted Pinky Nursefather - Shiomi Yoru","type":"Boss","mechanics":["禁用三区部署人格","护士父机制与部位联动；区末第三次幻蝶事件封印被动"]},
+      {"no":6,"section":4,"name":"沉溺 / Drowning Desire","boss":"折射的环指 父辈 - 卡利斯托 / Refracted Ring Nursefather - Callisto + 折射的环指 子辈 - 阿尔比娜 / Refracted Ring Nursechild - Albina","type":"Boss","mechanics":["双目标/召唤物联动","优先降低行动槽并防止艺术/状态效果滚高"]},
+      {"no":7,"section":4,"name":"蒙昧 / Blind Folly","boss":"折射的食指 父辈 - 里恩 / Refracted Index Nursefather - Rien","type":"Boss","mechanics":["指令/预言类条件技能","按被动条件安排拼点，保留终战所需资源"]},
+      {"no":8,"section":5,"name":"到来 / Advent","boss":"折射的罗生蝶::蝶 / Refracted Butterfly of Entangled Lives::Imago","type":"终点 Boss","mechanics":["继承第一区结束状态而非第四区状态","此前三次事件决定禁用哪些终战被动；根据保留机制制定分支轴"]}
+    ]
+  }
+]

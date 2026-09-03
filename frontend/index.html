@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="边狱公司折射轨道配队轴、短回合打法、Boss 机制与罪孽资源计算。" />
+  <title>轨道线维基 · Railway Archive</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="noise"></div>
+  <header class="topbar">
+    <a class="brand" href="#"><span class="brand-mark">◈</span><span><b>轨道线维基</b><small>RAILWAY ARCHIVE</small></span></a>
+    <nav><a class="active" href="#archive">轴档案</a><a href="#railways">线路图鉴</a><a href="#guide">收录标准</a></nav>
+    <button class="submit-btn" id="openEditor">＋ 新建配轴</button>
+  </header>
+
+  <main>
+    <section class="hero" id="about">
+      <div class="hero-copy">
+        <div class="eyebrow"><span></span> LIMBUS COMPANY / REFRACTION RAILWAY</div>
+        <h1>每一回合，<br><em>都有迹可循。</em></h1>
+        <p>选择人格与技能，逐回合录入打法，自动追踪七罪资源。<br>从 Boss 机制到实战分支，都归档在一条清晰的轴上。</p>
+        <div class="hero-actions"><button class="primary" id="heroEditor">开始录轴 <span>→</span></button><a class="text-link" href="#railways">查看 1～6 号线资料</a></div>
+      </div>
+      <div class="hero-visual" aria-hidden="true"><div class="dial"><span>TURN</span><strong id="heroBest">—</strong><small id="heroBestLabel">NO RECORD</small></div><div class="orbit one"></div><div class="orbit two"></div><div class="crosshair x"></div><div class="crosshair y"></div><span class="code c1">RR / 01—06</span><span class="code c2">OBSERVATION LOG</span></div>
+    </section>
+
+    <section class="stats" aria-label="站点数据">
+      <div><strong id="axisCount">0</strong><span>已收录轴</span></div><div><strong id="stationCount">67</strong><span>路线节点</span></div><div><strong>6</strong><span>原版轨道线</span></div><div><strong id="identityCount">—</strong><span>人格数据</span></div>
+    </section>
+
+    <section class="archive" id="archive">
+      <div class="section-heading"><div><span class="section-no">01</span><h2>轴档案库</h2><p>STRATEGY ARCHIVE</p></div><span class="result-count" id="resultCount"></span></div>
+      <div class="toolbar">
+        <label class="search"><span>⌕</span><input id="searchInput" type="search" placeholder="搜索关卡、人格、E.G.O 或作者…" /></label>
+        <div class="filters" id="filters"><button class="active" data-filter="全部">全部</button><button data-filter="6号线">6号线</button><button data-filter="5号线">5号线</button><button data-filter="4号线">4号线</button><button data-filter="短回合">短回合</button><button data-filter="低配">低配</button></div>
+        <select id="sortSelect"><option value="turns">回合数升序</option><option value="newest">最近更新</option><option value="likes">最多收藏</option></select>
+      </div>
+      <div class="axis-grid" id="axisGrid"></div><div class="empty" id="emptyState" hidden><b>未检索到对应档案</b><span>换一个关键词或筛选条件试试。</span></div>
+    </section>
+
+    <section class="railway-library" id="railways">
+      <div class="library-inner">
+        <div class="section-heading light"><div><span class="section-no">02</span><h2>轨道线图鉴</h2><p>ENCOUNTER DATABASE / 原版线路，不含复刻</p></div><span class="source-note" id="dataVersionNote">资料据 wiki.gg 整理 · 机制为实战摘要</span></div>
+        <div class="line-tabs" id="lineTabs"></div>
+        <div class="line-overview" id="lineOverview"></div>
+        <div class="station-grid" id="stationGrid"></div>
+      </div>
+    </section>
+
+    <section class="guide" id="guide">
+      <div class="section-heading light"><div><span class="section-no">03</span><h2>收录标准</h2><p>SUBMISSION PROTOCOL</p></div></div>
+      <div class="guide-grid"><article><span>Ⅰ</span><h3>可复现</h3><p>注明人格、同期、E.G.O 与关键被动，随机节点明确标注。</p></article><article><span>Ⅱ</span><h3>步骤清晰</h3><p>使用编辑器逐回合记录技能、目标与备选分支，资源由系统自动结算。</p></article><article><span>Ⅲ</span><h3>来源可溯</h3><p>标注作者与原始出处。改轴注明基础版本，尊重每位记录者。</p></article></div>
+    </section>
+  </main>
+
+  <footer><div class="brand mini"><span class="brand-mark">◈</span><span><b>轨道线维基</b><small>UNOFFICIAL ARCHIVE</small></span></div><p>非官方同人项目 · 游戏素材版权归 Project Moon 所有</p><a href="#">返回顶部 ↑</a></footer>
+
+  <dialog id="detailDialog" class="modal"><button class="close" data-close="detailDialog">×</button><div id="detailContent"></div></dialog>
+
+  <dialog id="editorDialog" class="editor-modal">
+    <header class="editor-head"><div><div class="modal-kicker">AXIS WORKBENCH / 配轴工作台</div><h2>新建实战轴</h2></div><div class="autosave">● 本地草稿自动保存</div><button class="close" data-close="editorDialog">×</button></header>
+    <div class="editor-body">
+      <section class="editor-section meta-section">
+        <div class="editor-section-title"><span>01</span><div><b>档案信息</b><small>FILE META</small></div></div>
+        <div class="editor-fields"><label>轴标题<input id="editTitle" placeholder="例：六号线 第五区 8T 轴" /></label><label>作者<input id="editAuthor" placeholder="记录员名称" /></label><label>轨道线<select id="editRailway"></select></label><label>记录范围<select id="editStation"></select></label><label>标签<input id="editTags" placeholder="短回合, 低凹度" /></label><label>总回合<input id="editTurns" type="number" min="1" placeholder="自动统计" /></label></div>
+      </section>
+
+      <section class="editor-section">
+        <div class="editor-section-title"><span>02</span><div><b>全线分区编成</b><small>DEPLOYMENT · 区段间可换队，并自动检查禁用人格</small></div><button class="small-btn" id="addMember">＋ 增加成员</button></div>
+        <div class="team-builder" id="teamBuilder"></div>
+      </section>
+
+      <section class="editor-section resource-section">
+        <div class="editor-section-title"><span>03</span><div><b>罪孽资源</b><small>AFFINITY LEDGER · 技能 +1 / E.G.O 扣除</small></div></div>
+        <div class="resource-ledger" id="resourceLedger"></div>
+        <div class="section-resource-ledger" id="sectionResourceLedger"></div>
+        <details class="initial-res"><summary>设置进站前已有罪孽资源</summary><div id="initialResources"></div></details>
+        <details class="initial-res"><summary>设置专属资源初始值（Hermes、纠缠、充能等）</summary><input id="initialStateText" class="state-input" placeholder="例：Hermes=0, 纠缠=2, 充能=10" /></details>
+      </section>
+
+      <section class="editor-section calculator-section">
+        <div class="editor-section-title"><span>04</span><div><b>状态 / DOT 基础计算</b><small>DETERMINISTIC STATUS CHECK · 不含抗性与完整伤害公式</small></div></div>
+        <div class="status-calculator">
+          <label>状态<select id="statusKind"><option value="Burn">烧伤</option><option value="Bleed">流血</option><option value="Rupture">破裂</option><option value="Sinking">沉沦</option><option value="Tremor">震颤</option></select></label>
+          <label>威力<input id="statusPotency" type="number" min="0" value="10"></label>
+          <label>层数<input id="statusCount" type="number" min="0" value="5"></label>
+          <label id="statusEventLabel">触发次数<input id="statusEvents" type="number" min="0" value="3"></label>
+          <label>经过回合末<input id="statusTurnEnds" type="number" min="0" value="1"></label>
+          <label>目标<select id="statusTarget"><option value="abnormality">异想体/无精神目标</option><option value="human">有精神单位</option></select></label>
+        </div>
+        <div class="status-result" id="statusResult"></div>
+      </section>
+
+      <section class="editor-section">
+        <div class="editor-section-title"><span>05</span><div><b>全线逐回合轴</b><small>TURN SEQUENCE · 回合连续记录，区段边界自动继承资源</small></div><button class="small-btn red" id="addTurn">＋ 给当前区段添加回合</button></div>
+        <div class="turn-list" id="turnList"></div>
+      </section>
+
+      <section class="editor-section"><div class="editor-section-title"><span>06</span><div><b>说明</b><small>NOTES</small></div></div><textarea id="editDesc" rows="4" placeholder="打法概述、技能袋要求、失败判定与备选分支…"></textarea></section>
+    </div>
+    <footer class="editor-footer"><button class="ghost-btn" id="clearDraft">清空草稿</button><span id="editorHint">先选择人格，再逐回合添加行动</span><button class="primary" id="saveAxis">保存到档案库 <span>→</span></button></footer>
+  </dialog>
+
+  <div class="toast" id="toast">档案已保存</div>
+  <script src="combat-rules.js"></script>
+  <script src="railway-structure.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
