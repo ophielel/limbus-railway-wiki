@@ -9,6 +9,7 @@ const { validateDataVolume } = require('../scripts/update-wiki-data.js');
 const indexHTML = fs.readFileSync(require.resolve('../frontend/index.html'), 'utf8');
 assert(!indexHTML.includes('<strong>57</strong><small>BEST RECORD</small>'), '首页仍展示伪造的 57 回合最佳记录');
 assert(indexHTML.includes('id="heroBest"'), '首页最佳记录没有动态数据挂载点');
+assert(!indexHTML.includes('id="editTurns"'),'前端仍允许手工填写总回合数');
 
 assert.equal(version.identities, identities.length, '人格版本计数不一致');
 assert.equal(version.skills, identities.flatMap(identity => identity.skills).length, '技能版本计数不一致');

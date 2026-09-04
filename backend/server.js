@@ -9,7 +9,7 @@ const PORT = Number(process.env.PORT || 3000);
 const HOST = process.env.HOST || '127.0.0.1';
 const DATA_DIR = path.join(__dirname, 'data');
 const files = {
-  axes: path.join(DATA_DIR, 'axes.json'), railways: path.join(DATA_DIR, 'railways.json'),
+  axes:process.env.AXES_FILE?path.resolve(process.env.AXES_FILE):path.join(DATA_DIR,'axes.json'), railways: path.join(DATA_DIR, 'railways.json'),
   identities: path.join(DATA_DIR, 'identities.json'), egos: path.join(DATA_DIR, 'egos.json'),
   dataVersion: path.join(DATA_DIR, 'data-version.json')
 };
@@ -107,9 +107,9 @@ async function readBody(req) {
 }
 
 const server = http.createServer(async (req, res) => {
-  if (req.method === 'OPTIONS') return send(res, 204);
-  const url = new URL(req.url, `http://${req.headers.host}`);
+  if(req.method==='OPTIONS')return send(res,204);
   try {
+    let url;try{url=new URL(req.url,`http://${req.headers.host||HOST}`);}catch{return send(res,400,{error:'URL 格式错误'});}
     if (req.method === 'GET' && url.pathname === '/api/health') return send(res,200,{ok:true,version:'0.14.0'});
     if (req.method === 'GET' && url.pathname === '/api/axes') return send(res, 200, await readJSON(files.axes));
     if (req.method === 'GET' && url.pathname === '/api/railways') return send(res, 200, await readJSON(files.railways));
@@ -117,7 +117,8 @@ const server = http.createServer(async (req, res) => {
     if (req.method === 'GET' && url.pathname === '/api/egos') return send(res, 200, await readJSON(files.egos));
     if (req.method === 'GET' && url.pathname === '/api/data-version') return send(res, 200, await readJSON(files.dataVersion));
     if (req.method === 'GET' && url.pathname.startsWith('/api/axes/')) {
-      const axis = (await readJSON(files.axes)).find(item => item.id === decodeURIComponent(url.pathname.slice(10)));
+      let axisId;try{axisId=decodeURIComponent(url.pathname.slice(10));}catch{return send(res,400,{error:'URL 格式错误'});}
+      const axis=(await readJSON(files.axes)).find(item=>item.id===axisId);
       return axis ? send(res, 200, axis) : send(res, 404, {error:'档案不存在'});
     }
     if (req.method === 'POST' && url.pathname === '/api/axes') {
@@ -146,6 +147,9 @@ const server = http.createServer(async (req, res) => {
         if((Array.isArray(turn.deaths)?turn.deaths:[]).some(memberKey=>!identityByKey[String(memberKey)]))return send(res,400,{error:'阵亡记录引用了不存在的人格'});
         if(turn.saplingTargetMemberKey&&!identityByKey[String(turn.saplingTargetMemberKey)])return send(res,400,{error:'光之树苗目标人格不存在'});
         if(!Array.isArray(turn.actions))return send(res,400,{error:'回合行动必须是数组'});
+        if(turn.actions.length>20)return send(res,400,{error:'单回合行动不能超过 20 条'});
+        if(turn.branches!=null&&!Array.isArray(turn.branches))return send(res,400,{error:'回合分支必须是数组'});
+        if(Array.isArray(turn.branches)&&turn.branches.length>10)return send(res,400,{error:'单回合分支不能超过 10 条'});
         for(const action of turn.actions){
           const identity=identityByKey[String(action?.memberKey||'')];if(!identity)return send(res,400,{error:'行动引用了不存在的人格'});
           const mode=action.mode==='ego-corrosion'?'ego-induced-corrosion':String(action.mode||'skill');if(mode!=='skill'&&!EGO_MODES.includes(mode))return send(res,400,{error:'行动模式无效'});
@@ -191,8 +195,8 @@ const server = http.createServer(async (req, res) => {
       const plan = input.plan.map((turn,index) => ({
         turn:index+1, section:Number(turn.section), station:Math.max(0,cleanNumber(turn.station)), sectionTurn:1, wayfarerTriggered:turn.wayfarerTriggered===true, saplingAbility:cleanText(turn.saplingAbility,20), saplingTargetMemberKey:cleanText(turn.saplingTargetMemberKey,80),
         note: cleanText(turn.note, 300), stateChanges: cleanText(turn.stateChanges,500), deaths:Array.isArray(turn.deaths)?[...new Set(turn.deaths.map(value=>cleanText(value,80)).filter(Boolean))].slice(0,12):[],
-        branches: Array.isArray(turn.branches) ? turn.branches.slice(0,10).map(branch=>({condition:cleanText(branch.condition,200),result:cleanText(branch.result,300)})) : [],
-        actions: Array.isArray(turn.actions) ? turn.actions.slice(0, 20).map(action => ({
+        branches:Array.isArray(turn.branches)?turn.branches.map(branch=>({condition:cleanText(branch.condition,200),result:cleanText(branch.result,300)})):[],
+        actions:turn.actions.map(action => ({
           memberKey: cleanText(action.memberKey, 80), member: cleanText(action.member, 100),
           mode: ['ego','ego-awakening','ego-corrosion','ego-overclock','ego-induced-corrosion','ego-forced-corrosion'].includes(action.mode) ? (action.mode==='ego-corrosion'?'ego-induced-corrosion':action.mode) : 'skill', choice: cleanText(action.choice, 200), egoId:cleanText(action.egoId,30), egoRisk:EGO_RISKS.includes(action.egoRisk)?action.egoRisk:'',
           affinity: cleanText(action.affinity, 20), target: cleanText(action.target, 100), skillSlot:cleanText(action.skillSlot,30), skillType:['Slash','Pierce','Blunt'].includes(action.skillType)?action.skillType:'', skillAffinity:SINS.includes(action.skillAffinity)?action.skillAffinity:'',
@@ -213,7 +217,7 @@ const server = http.createServer(async (req, res) => {
             threshold: cleanNumber(action.specialMechanic.threshold), actual: cleanNumber(action.specialMechanic.actual),
             replacementSkill: cleanText(action.specialMechanic.replacementSkill,100), maxActivations: cleanNumber(action.specialMechanic.maxActivations,1)
           } : null
-        })) : []
+        }))
       }));
       const submittedTeamData=canonicalTeamData(input.teamData,identityByKey),trustedLevels=Object.fromEntries(deployments.map(item=>[item.section,Object.fromEntries(item.teamData.map(member=>[member.key,member.level]))]));
       if(!trustedLevels[1])trustedLevels[1]=Object.fromEntries(submittedTeamData.map(member=>[member.key,member.level]));

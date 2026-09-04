@@ -1,11 +1,18 @@
 const assert = require('assert');
 const fs = require('fs/promises');
+const fsSync = require('fs');
+const http = require('http');
+const os = require('os');
 const path = require('path');
 const identities = require('../backend/data/identities.json');
 const egos = require('../backend/data/egos.json');
-const { server } = require('../backend/server.js');
-
-const axesFile = path.join(__dirname, '..', 'backend', 'data', 'axes.json');
+const officialAxesFile=path.join(__dirname,'..','backend','data','axes.json');
+const tempDir=fsSync.mkdtempSync(path.join(os.tmpdir(),'railway-wiki-test-'));
+const axesFile=path.join(tempDir,'axes.json');
+fsSync.writeFileSync(axesFile,'[]\n');
+process.env.AXES_FILE=axesFile;
+const {server}=require('../backend/server.js');
+const {server:frontendServer}=require('../frontend/server.js');
 const identity = identities[0];
 const identityKey = String(identity.id);
 const skill = identity.skills[0];
@@ -34,6 +41,10 @@ async function request(base, body, options = {}) {
   return { status: response.status, body: json };
 }
 
+function rawRequest(port,urlPath,host='127.0.0.1'){
+  return new Promise((resolve,reject)=>{const req=http.request({hostname:'127.0.0.1',port,path:urlPath,headers:{Host:host}},res=>{res.resume();res.on('end',()=>resolve(res.statusCode));});req.on('error',reject);req.end();});
+}
+
 function line4Payload() {
   const teamData = Array.from({ length: 12 }, (_, index) => {
     const item = identities.find(value => value.sinner === index + 1);
@@ -46,11 +57,18 @@ function line4Payload() {
   });
 }
 
-(async () => {
-  const originalAxes = await fs.readFile(axesFile);
-  await new Promise(resolve => server.listen(0, '127.0.0.1', resolve));
-  const base = `http://127.0.0.1:${server.address().port}`;
-  try {
+(async()=>{
+  const officialAxes=await fs.readFile(officialAxesFile);
+  await Promise.all([
+    new Promise(resolve=>server.listen(0,'127.0.0.1',resolve)),
+    new Promise(resolve=>frontendServer.listen(0,'127.0.0.1',resolve))
+  ]);
+  const base=`http://127.0.0.1:${server.address().port}`;
+  try{
+    assert.equal(await rawRequest(frontendServer.address().port,'/%E0%A4%A'),400,'前端畸形 URL 应返回 400');
+    assert.equal(await rawRequest(frontendServer.address().port,'/'),200,'畸形 URL 后前端进程应继续服务');
+    assert.equal(await rawRequest(server.address().port,'/api/health','['),400,'后端畸形 URL 应返回 400');
+    assert.equal(await rawRequest(server.address().port,'/api/health'),200,'畸形 URL 后后端进程应继续服务');
     const forged = await request(base, payload());
     assert.equal(forged.status, 201);
     assert.equal(forged.body.turns, 1, '总回合数必须根据 plan 计算');
@@ -78,7 +96,11 @@ function line4Payload() {
     assert.equal((await request(base, payload({ title: '   ' }))).status, 400, 'trim 后空标题应拒绝');
     assert.equal((await request(base, '{bad json', { raw: true })).status, 400, '非法 JSON 应返回 400');
     assert.equal((await request(base, JSON.stringify({ data: 'x'.repeat(2_000_001) }), { raw: true })).status, 413, '过大请求体应返回 413');
-    assert.equal((await request(base, payload({ plan: Array.from({ length: 201 }, () => ({ section: 1, actions: [] })) }))).status, 400, '超过 200 回合应拒绝而不是截断');
+    assert.equal((await request(base,payload({plan:Array.from({length:201},()=>({section:1,actions:[]}))}))).status,400,'超过 200 回合应拒绝而不是截断');
+    const validAction={memberKey:identityKey,mode:'skill',skillSlot:skill.slot},atLimit=await request(base,payload({plan:[{section:1,actions:Array.from({length:20},()=>({...validAction})),branches:Array.from({length:10},()=>({condition:'条件',result:'结果'}))}]}));
+    assert.equal(atLimit.status,201);assert.equal(atLimit.body.plan[0].actions.length,20,'已验证的行动必须全部保存');assert.equal(atLimit.body.plan[0].branches.length,10,'已验证的分支必须全部保存');
+    assert.equal((await request(base,payload({plan:[{section:1,actions:Array.from({length:21},()=>({...validAction}))}]}))).status,400,'单回合超过 20 个行动应拒绝而不是截断');
+    assert.equal((await request(base,payload({plan:[{section:1,actions:[],branches:Array.from({length:11},()=>({condition:'条件',result:'结果'}))}]}))).status,400,'单回合超过 10 个分支应拒绝而不是截断');
 
     const before = JSON.parse(await fs.readFile(axesFile, 'utf8')).length;
     const concurrent = await Promise.all(Array.from({ length: 12 }, (_, index) => request(base, payload({ title: `并发-${index}` }))));
@@ -86,8 +108,9 @@ function line4Payload() {
     const after = JSON.parse(await fs.readFile(axesFile, 'utf8')).length;
     assert.equal(after - before, 12, '并发保存不能丢档案');
     console.log('http-integration: 后端信任边界、错误状态、原子并发保存验证通过');
-  } finally {
-    await new Promise(resolve => server.close(resolve));
-    await fs.writeFile(axesFile, originalAxes);
+  }finally{
+    await Promise.all([new Promise(resolve=>server.close(resolve)),new Promise(resolve=>frontendServer.close(resolve))]);
+    assert.deepEqual(await fs.readFile(officialAxesFile),officialAxes,'HTTP 测试不得修改正式 axes.json');
+    await fs.rm(tempDir,{recursive:true,force:true});
   }
-})().catch(error => { console.error(error); process.exitCode = 1; });
+})().catch(error=>{console.error(error);process.exitCode=1;});
