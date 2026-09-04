@@ -1,6 +1,6 @@
 {
   "name": "railway-wiki",
-  "version": "0.13.0",
+  "version": "0.14.0",
   "private": true,
   "license": "UNLICENSED",
   "description": "边狱公司折射轨道配队轴档案站（前后端分离）",
@@ -9,7 +9,7 @@
     "frontend": "node frontend/server.js",
     "backend": "node backend/server.js",
     "update:data": "node scripts/update-wiki-data.js",
-    "test": "node tests/combat-rules.test.js && node tests/editor-completeness.test.js && node tests/railway-structure.test.js && node tests/journey-editor.test.js && node tests/deployment-state.test.js && node tests/ego-roster.test.js && node tests/line-mechanics.test.js && node tests/line-mechanic-regressions.test.js && node tests/line5-effects.test.js && node tests/line6-effects.test.js && node tests/line6-sapling.test.js && node tests/translation-alignment.test.js && node tests/project-integrity.test.js"
+    "test": "node tests/combat-rules.test.js && node tests/editor-completeness.test.js && node tests/railway-structure.test.js && node tests/journey-editor.test.js && node tests/deployment-state.test.js && node tests/ego-roster.test.js && node tests/line-mechanics.test.js && node tests/line-mechanic-regressions.test.js && node tests/line5-effects.test.js && node tests/line6-effects.test.js && node tests/line6-sapling.test.js && node tests/translation-alignment.test.js && node tests/project-integrity.test.js && node tests/http-integration.test.js"
   },
   "engines": { "node": ">=18" }
 }

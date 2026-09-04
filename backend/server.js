@@ -6,6 +6,7 @@ const RailwayStructure = require('../frontend/railway-structure.js');
 const CombatRules = require('../frontend/combat-rules.js');
 
 const PORT = Number(process.env.PORT || 3000);
+const HOST = process.env.HOST || '127.0.0.1';
 const DATA_DIR = path.join(__dirname, 'data');
 const files = {
   axes: path.join(DATA_DIR, 'axes.json'), railways: path.join(DATA_DIR, 'railways.json'),
@@ -26,6 +27,15 @@ const cleanDeployments = value => Array.isArray(value) ? value.slice(0,8).map(it
 const cleanSectionResources = value => Array.isArray(value) ? value.slice(0,8).map(item=>({section:Math.max(1,cleanNumber(item?.section,1)),entry:cleanResources(item?.entry),exit:cleanResources(item?.exit)})) : [];
 const cleanSinnerStates = value => Object.fromEntries(Array.from({length:12},(_,index)=>{const sinner=index+1,state=value?.[sinner]||value?.[String(sinner)]||{};return [sinner,{hpPercent:Math.min(100,Math.max(0,cleanNumber(state.hpPercent,100))),sp:Math.min(45,Math.max(-45,cleanNumber(state.sp)))}];}));
 const EGO_RISKS=['ZAYIN','TETH','HE','WAW','ALEPH'];
+const EGO_MODES=['ego','ego-awakening','ego-corrosion','ego-overclock','ego-induced-corrosion','ego-forced-corrosion'];
+const isIntegerValue=value=>Number.isInteger(Number(value));
+const canonicalTeamData=(value,identityByKey)=>cleanTeamData(value).map(member=>{const identity=identityByKey[member.key];return identity?{key:String(identity.id),sinner:identity.sinner,name:identity.name,rarity:identity.rarity,level:member.level}:member;});
+let axesWriteQueue=Promise.resolve();
+const appendAxis=axis=>{
+  const write=axesWriteQueue.then(async()=>{const axes=await readJSON(files.axes);axes.unshift(axis);const temporary=`${files.axes}.${process.pid}.${randomUUID()}.tmp`;try{await fs.writeFile(temporary,JSON.stringify(axes,null,2),'utf8');await fs.rename(temporary,files.axes);}catch(error){await fs.unlink(temporary).catch(()=>{});throw error;}});
+  axesWriteQueue=write.catch(()=>{});
+  return write;
+};
 const cleanLineMechanics = (line,value={}) => {
   const rules=line?.recordRules;
   if(rules?.type==='buff-trials')return {buffTrials:Object.fromEntries(rules.stations.map(station=>{const choice=value.buffTrials?.[station]||value.buffTrials?.[String(station)]||{},allowed=RailwayStructure.line5AllowedOptions(line,station),buff=cleanText(choice.buff,100),trial=cleanText(choice.trial,100);return [station,{buff:allowed.buffs.includes(buff)?buff:'',trial:allowed.trials.includes(trial)?trial:''}];}))};
@@ -87,9 +97,11 @@ const normalizeSectionStates = (line,value) => {const submitted=Object.fromEntri
 
 async function readBody(req) {
   return new Promise((resolve, reject) => {
-    let raw = '';
-    req.on('data', chunk => { raw += chunk; if (raw.length > 2e6) reject(new Error('请求过大')); });
-    req.on('end', () => { try { resolve(JSON.parse(raw || '{}')); } catch { reject(new Error('JSON 格式错误')); } });
+    const limit=2_000_000,declared=Number(req.headers['content-length']);
+    if(Number.isFinite(declared)&&declared>limit){req.resume();return reject(Object.assign(new Error('请求体过大'),{status:413}));}
+    let raw='',bytes=0,settled=false;
+    req.on('data', chunk => {bytes+=chunk.length;if(bytes>limit){raw='';if(!settled){settled=true;reject(Object.assign(new Error('请求体过大'),{status:413}));}}else if(!settled)raw+=chunk;});
+    req.on('end', () => {if(settled)return;try{resolve(JSON.parse(raw||'{}'));}catch{reject(Object.assign(new Error('JSON 格式错误'),{status:400}));}});
     req.on('error', reject);
   });
 }
@@ -98,7 +110,7 @@ const server = http.createServer(async (req, res) => {
   if (req.method === 'OPTIONS') return send(res, 204);
   const url = new URL(req.url, `http://${req.headers.host}`);
   try {
-    if (req.method === 'GET' && url.pathname === '/api/health') return send(res, 200, {ok:true, version:'0.13.0'});
+    if (req.method === 'GET' && url.pathname === '/api/health') return send(res,200,{ok:true,version:'0.14.0'});
     if (req.method === 'GET' && url.pathname === '/api/axes') return send(res, 200, await readJSON(files.axes));
     if (req.method === 'GET' && url.pathname === '/api/railways') return send(res, 200, await readJSON(files.railways));
     if (req.method === 'GET' && url.pathname === '/api/identities') return send(res, 200, await readJSON(files.identities));
@@ -110,9 +122,43 @@ const server = http.createServer(async (req, res) => {
     }
     if (req.method === 'POST' && url.pathname === '/api/axes') {
       const input = await readBody(req);
-      if (!input.title || !input.author || !input.turns || !input.desc) return send(res, 400, {error:'标题、作者、回合数和说明为必填项'});
-      const lineId=Number(String(input.railway||'').replace(/\D/g,'')),line=(await readJSON(files.railways)).find(item=>item.id===lineId),identityByKey=Object.fromEntries((await readJSON(files.identities)).map(item=>[String(item.id),item])),egoById=Object.fromEntries((await readJSON(files.egos)).map(item=>[String(item.id),item])),egoLoadouts=line?.battleFormat==='continuous-sections'?cleanEgoLoadouts(line,input.egoLoadouts,egoById):{},lineMechanics=cleanLineMechanics(line,input.lineMechanics),deployments=cleanDeployments(input.deployments);
-      for(const turn of input.plan||[])for(const action of turn.actions||[])if(String(action.mode||'').startsWith('ego')){const ego=egoById[String(action.egoId||'')],identity=identityByKey[String(action.memberKey||'')];if(!ego||!identity||ego.sinner!==identity.sinner)return send(res,400,{error:'E.G.O 与行动罪人不匹配'});const sanity=CombatRules.egoSanityProfile(action.mode,action.sp,ego.sanity);if(!sanity.valid)return send(res,400,{error:action.mode==='ego-forced-corrosion'?'回合开始强制侵蚀要求使用前理智值为 -45':'当前理智值不会触发意外侵蚀'});}
+      const title=cleanText(input.title,100),author=cleanText(input.author,40),desc=cleanText(input.desc,1000);
+      if(!title||!author||!desc)return send(res,400,{error:'标题、作者和说明为必填项'});
+      if(!Array.isArray(input.plan)||input.plan.length<1)return send(res,400,{error:'至少需要一个回合记录'});
+      if(input.plan.length>200)return send(res,400,{error:'回合记录不能超过 200 条'});
+      const railwayMatch=String(input.railway||'').trim().match(/^(\d+)号线$/),lineId=Number(railwayMatch?.[1]);
+      const [railways,identities,egos]=await Promise.all([readJSON(files.railways),readJSON(files.identities),readJSON(files.egos)]),line=railways.find(item=>item.id===lineId);
+      if(!line)return send(res,400,{error:'轨道线不存在'});
+      const identityByKey=Object.fromEntries(identities.map(item=>[String(item.id),item])),egoById=Object.fromEntries(egos.map(item=>[String(item.id),item]));
+      const submittedTeams=[...(Array.isArray(input.teamData)?[input.teamData]:[]),...(Array.isArray(input.deployments)?input.deployments.map(item=>item?.teamData):[])].filter(Array.isArray);
+      for(const team of submittedTeams)for(const member of team){if(!identityByKey[String(member?.key||'')])return send(res,400,{error:'队伍包含不存在的人格'});if(!isIntegerValue(member?.sinner)||!isIntegerValue(member?.level))return send(res,400,{error:'罪人编号和人格等级必须是整数'});if(Number(member.level)<1||Number(member.level)>MAX_IDENTITY_LEVEL)return send(res,400,{error:`人格等级必须在 1～${MAX_IDENTITY_LEVEL} 之间`});}
+      if(SINS.some(sin=>input.initialResources?.[sin]!=null&&(!isIntegerValue(input.initialResources[sin])||Number(input.initialResources[sin])<0)))return send(res,400,{error:'七罪资源必须是非负整数'});
+      for(const deployment of Array.isArray(input.deployments)?input.deployments:[])if(!isIntegerValue(deployment?.section))return send(res,400,{error:'部署区段必须是整数'});
+      for(const [sectionKey,sinners] of Object.entries(input.egoLoadouts&&typeof input.egoLoadouts==='object'?input.egoLoadouts:{})){if(!isIntegerValue(sectionKey)||Number(sectionKey)<1||Number(sectionKey)>Math.max(1,line.sectionCount||1))return send(res,400,{error:'E.G.O 装备区段无效'});for(const [sinnerKey,loadout] of Object.entries(sinners&&typeof sinners==='object'?sinners:{})){if(!isIntegerValue(sinnerKey)||Number(sinnerKey)<1||Number(sinnerKey)>12)return send(res,400,{error:'E.G.O 装备罪人编号无效'});for(const [risk,egoIdValue] of Object.entries(loadout&&typeof loadout==='object'?loadout:{})){const egoId=String(egoIdValue||'');if(!egoId)continue;const ego=egoById[egoId];if(!EGO_RISKS.includes(risk)||!ego||ego.sinner!==Number(sinnerKey)||ego.rarity!==risk)return send(res,400,{error:`第 ${sectionKey} 区段包含无效的 E.G.O 装备`});}}}
+      let previousSection=0;
+      for(const turn of input.plan){
+        if(!isIntegerValue(turn?.section))return send(res,400,{error:'回合区段必须是整数'});
+        if(turn.station!=null&&!isIntegerValue(turn.station))return send(res,400,{error:'站点必须是整数'});
+        const section=Number(turn.section);
+        if(section<1||section>Math.max(1,line.sectionCount||1))return send(res,400,{error:'回合区段超出轨道线范围'});
+        if(line.battleFormat==='continuous-sections'&&(section<previousSection||section>previousSection+1||(!previousSection&&section!==1)))return send(res,400,{error:'连续战区段顺序不合法'});
+        previousSection=section;
+        if((Array.isArray(turn.deaths)?turn.deaths:[]).some(memberKey=>!identityByKey[String(memberKey)]))return send(res,400,{error:'阵亡记录引用了不存在的人格'});
+        if(turn.saplingTargetMemberKey&&!identityByKey[String(turn.saplingTargetMemberKey)])return send(res,400,{error:'光之树苗目标人格不存在'});
+        if(!Array.isArray(turn.actions))return send(res,400,{error:'回合行动必须是数组'});
+        for(const action of turn.actions){
+          const identity=identityByKey[String(action?.memberKey||'')];if(!identity)return send(res,400,{error:'行动引用了不存在的人格'});
+          const mode=action.mode==='ego-corrosion'?'ego-induced-corrosion':String(action.mode||'skill');if(mode!=='skill'&&!EGO_MODES.includes(mode))return send(res,400,{error:'行动模式无效'});
+          const ego=mode==='skill'?null:egoById[String(action.egoId||'')],skills=mode==='skill'?(identity.skills||[]):CombatRules.egoUseProfile(mode).skillKind==='awakening'?(ego?.awakeningSkills||[]):(ego?.corrosionSkills||[]),skill=skills.find(item=>item.slot===String(action.skillSlot||''));
+          if(mode!=='skill'&&(!ego||ego.sinner!==identity.sinner))return send(res,400,{error:'E.G.O 与行动罪人不匹配'});
+          if(!skill)return send(res,400,{error:`人格或 E.G.O 不存在技能槽 ${String(action.skillSlot||'')}`});
+          const integerFields=['heads','targetDefenseLevel','sameFactionCount','rouletteFinalPower','targetSp','sinkingPotency','poisePotency','poiseCount','chargeCount','bloodfeastConsumed','targetCount','reuse','effectiveAttackWeight','actualTargets','excessAttackWeight'];
+          if(integerFields.some(key=>action[key]!=null&&!isIntegerValue(action[key])))return send(res,400,{error:'行动中的计数、等级字段必须是整数'});
+          if(ego){const sanity=CombatRules.egoSanityProfile(mode,action.sp,ego.sanity);if(!sanity.valid)return send(res,400,{error:mode==='ego-forced-corrosion'?'回合开始强制侵蚀要求使用前理智值为 -45':'当前理智值不会触发意外侵蚀'});}
+        }
+      }
+      const sectionTurnCounts={};input.plan.forEach((turn,index)=>{turn.turn=index+1;turn.sectionTurn=(sectionTurnCounts[turn.section]||0)+1;sectionTurnCounts[turn.section]=turn.sectionTurn;});
+      const egoLoadouts=line.battleFormat==='continuous-sections'?cleanEgoLoadouts(line,input.egoLoadouts,egoById):{},lineMechanics=cleanLineMechanics(line,input.lineMechanics),deployments=cleanDeployments(input.deployments).map(deployment=>({...deployment,teamData:canonicalTeamData(deployment.teamData,identityByKey)}));
       if(line?.battleFormat==='continuous-sections'){const bySection=Object.fromEntries(deployments.map(item=>[item.section,item]));
         for(let section=1;section<=line.sectionCount;section++){
           const deployment=bySection[section];
@@ -142,9 +188,8 @@ const server = http.createServer(async (req, res) => {
           roster.active=roster.active.filter(member=>!deaths.includes(member));while(roster.active.length<line.deploymentRules.frontline&&roster.backup.length)roster.active.push(roster.backup.shift());
         }
       }
-      const axes = await readJSON(files.axes);
-      const plan = Array.isArray(input.plan) ? input.plan.slice(0, 200).map(turn => ({
-        turn: Number(turn.turn) || 1, section: Math.max(1,cleanNumber(turn.section,1)), station:Math.max(0,cleanNumber(turn.station)), sectionTurn: Math.max(1,cleanNumber(turn.sectionTurn,turn.turn||1)), wayfarerTriggered:turn.wayfarerTriggered===true, saplingAbility:cleanText(turn.saplingAbility,20), saplingTargetMemberKey:cleanText(turn.saplingTargetMemberKey,80),
+      const plan = input.plan.map((turn,index) => ({
+        turn:index+1, section:Number(turn.section), station:Math.max(0,cleanNumber(turn.station)), sectionTurn:1, wayfarerTriggered:turn.wayfarerTriggered===true, saplingAbility:cleanText(turn.saplingAbility,20), saplingTargetMemberKey:cleanText(turn.saplingTargetMemberKey,80),
         note: cleanText(turn.note, 300), stateChanges: cleanText(turn.stateChanges,500), deaths:Array.isArray(turn.deaths)?[...new Set(turn.deaths.map(value=>cleanText(value,80)).filter(Boolean))].slice(0,12):[],
         branches: Array.isArray(turn.branches) ? turn.branches.slice(0,10).map(branch=>({condition:cleanText(branch.condition,200),result:cleanText(branch.result,300)})) : [],
         actions: Array.isArray(turn.actions) ? turn.actions.slice(0, 20).map(action => ({
@@ -169,30 +214,39 @@ const server = http.createServer(async (req, res) => {
             replacementSkill: cleanText(action.specialMechanic.replacementSkill,100), maxActivations: cleanNumber(action.specialMechanic.maxActivations,1)
           } : null
         })) : []
-      })) : [];
-      const trustedLevels=Object.fromEntries(deployments.map(item=>[item.section,Object.fromEntries(item.teamData.map(member=>[member.key,member.level]))]));
-      for(const turn of plan)for(const action of turn.actions)action.identityLevel=trustedLevels[turn.section]?.[action.memberKey]||MAX_IDENTITY_LEVEL;
+      }));
+      const submittedTeamData=canonicalTeamData(input.teamData,identityByKey),trustedLevels=Object.fromEntries(deployments.map(item=>[item.section,Object.fromEntries(item.teamData.map(member=>[member.key,member.level]))]));
+      if(!trustedLevels[1])trustedLevels[1]=Object.fromEntries(submittedTeamData.map(member=>[member.key,member.level]));
+      const sectionTurns={};
+      for(const turn of plan){
+        turn.sectionTurn=(sectionTurns[turn.section]||0)+1;sectionTurns[turn.section]=turn.sectionTurn;
+        for(const action of turn.actions){
+          const identity=identityByKey[action.memberKey],mode=action.mode,ego=mode==='skill'?null:egoById[action.egoId],use=CombatRules.egoUseProfile(mode),skills=mode==='skill'?identity.skills:use.skillKind==='awakening'?ego.awakeningSkills:ego.corrosionSkills,skill=skills.find(item=>item.slot===action.skillSlot);
+          action.member=`${identity.sinnerName}·${identity.name}`;action.identityName=identity.name;action.sinner=identity.sinner;action.identityLevel=trustedLevels[turn.section]?.[action.memberKey]||MAX_IDENTITY_LEVEL;
+          action.choice=ego?`${ego.name} · ${skill.name}`:`${skill.name}（${skill.slot}·${skill.affinity}）`;action.affinity=skill.affinity;action.skillType=skill.type;action.skillAffinity=skill.affinity;
+          action.egoId=ego?String(ego.id):'';action.egoName=ego?.name||'';action.egoRisk=ego?.rarity||'';
+        }
+      }
       normalizeCommonActionEffects(line,plan,identityByKey,egoById,deployments);
       normalizeLine5ActionEffects(line,lineMechanics,plan,identityByKey,egoById);
       normalizeLine6ActionEffects(line,lineMechanics,plan,identityByKey,egoById);
       const resourceLedger=recomputeJourneyResources(line,lineMechanics,plan,cleanResources(input.initialResources),identityByKey,egoById);
       const axis = {
-        id: randomUUID(), title: cleanText(input.title, 100), railway: cleanText(input.railway || '6号线', 20),
-        station: cleanText(input.station, 100), turns: Math.max(1, Number(input.turns) || plan.length || 1),
-        author: cleanText(input.author, 40), date: new Date().toISOString().slice(0,10), likes:0, difficulty:'待验证',
-        tags: Array.isArray(input.tags) ? input.tags.slice(0,8).map(v=>cleanText(v,20)) : [],
-        team: Array.isArray(input.team) ? input.team.slice(0,12).map(v=>cleanText(v,100)) : [],
-        teamData: cleanTeamData(input.teamData), deployments: cleanDeployments(input.deployments), egoLoadouts, lineMechanics,
-        desc: cleanText(input.desc, 1000), steps: plan.map(t=>`${input.deployments?.length?`S${t.section}-T${t.sectionTurn}`:`T${t.turn}`}：${t.note || t.actions.map(a=>`${a.member} ${a.choice}`).join('；')}`),
+        id: randomUUID(), title, railway:`${line.id}号线`,
+        station:cleanText(input.station,100), turns:plan.length,
+        author, date:new Date().toISOString().slice(0,10), likes:0, difficulty:'待验证',
+        tags:Array.isArray(input.tags)?input.tags.slice(0,8).map(v=>cleanText(v,20)).filter(Boolean):[],
+        team:submittedTeamData.map(item=>`${item.sinnerName||identityByKey[item.key]?.sinnerName||item.sinner}·${item.name}`),
+        teamData:submittedTeamData, deployments, egoLoadouts, lineMechanics,
+        desc, steps: plan.map(t=>`${input.deployments?.length?`S${t.section}-T${t.sectionTurn}`:`T${t.turn}`}：${t.note || t.actions.map(a=>`${a.member} ${a.choice}`).join('；')}`),
         plan, initialResources: cleanResources(input.initialResources), sectionResources: resourceLedger.sections, sectionStates: line?.battleFormat==='continuous-sections'?normalizeSectionStates(line,input.sectionStates):[], finalResources: resourceLedger.resources,
         initialStateText: cleanText(input.initialStateText,1000), finalState: cleanState(input.finalState)
       };
-      axes.unshift(axis);
-      await fs.writeFile(files.axes, JSON.stringify(axes, null, 2), 'utf8');
-      return send(res, 201, axis);
+      await appendAxis(axis);
+      return send(res,201,axis);
     }
     return send(res, 404, {error:'接口不存在'});
-  } catch (error) { console.error(error); return send(res, 500, {error:error.message || '服务器内部错误'}); }
+  } catch (error) {if(!error.status||error.status>=500)console.error(error);return send(res,error.status||500,{error:error.message||'服务器内部错误'});}
 });
-if(require.main===module)server.listen(PORT, () => console.log(`后端 API: http://localhost:${PORT}`));
+if(require.main===module)server.listen(PORT,HOST,()=>console.log(`后端 API: http://${HOST}:${PORT}`));
 module.exports={server,cleanLineMechanics,normalizeCommonActionEffects,normalizeLine5ActionEffects,normalizeLine6ActionEffects,recomputeJourneyResources};

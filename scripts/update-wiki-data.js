@@ -186,6 +186,12 @@ function egoFrom(page){
   };
 }
 
+function validateDataVolume(next,current,pageCount,label,{minimum,ratio=0.7,parseRatio=0.5}){
+  if(next.length<minimum)throw new Error(`${label} 数据量异常：仅解析出 ${next.length} 条（最低 ${minimum}）`);
+  if(current.length&&next.length<Math.ceil(current.length*ratio))throw new Error(`${label} 数据量异常：少于现有数据库的 ${Math.round(ratio*100)}%`);
+  if(pageCount&&next.length<Math.ceil(pageCount*parseRatio))throw new Error(`${label} 数据量异常：Wiki 页面解析成功率低于 ${Math.round(parseRatio*100)}%`);
+}
+
 async function main(){
   console.log('读取人格目录…'); const identityTitles=await categoryMembers('Identities');
   console.log(`获取 ${identityTitles.length} 个人格页面…`); const identityPages=await pageSources(identityTitles);
@@ -199,9 +205,16 @@ async function main(){
   const egos=egoParsed.map(x=>x.data).filter(Boolean).sort((a,b)=>a.sinner-b.sinner||a.name.localeCompare(b.name));
   const skippedEgos=egoParsed.filter(x=>!x.data).map(x=>x.page.title);
   if(skippedEgos.length)console.warn(`跳过的 E.G.O 页面 (${skippedEgos.length}): ${skippedEgos.join(' | ')}`);
+  const [currentIdentities,currentEgos]=await Promise.all([
+    fs.readFile(path.join(OUT,'identities.json'),'utf8').then(JSON.parse).catch(()=>[]),
+    fs.readFile(path.join(OUT,'egos.json'),'utf8').then(JSON.parse).catch(()=>[])
+  ]);
+  validateDataVolume(identities,currentIdentities,identityTitles.length,'人格',{minimum:50});
+  validateDataVolume(egos,currentEgos,egoTitles.length,'E.G.O',{minimum:30});
   await fs.writeFile(path.join(OUT,'identities.json'),JSON.stringify(identities,null,2),'utf8');
   await fs.writeFile(path.join(OUT,'egos.json'),JSON.stringify(egos,null,2),'utf8');
   await fs.writeFile(path.join(OUT,'data-version.json'),JSON.stringify({updatedAt:new Date().toISOString(),source:'Limbus Company Wiki.gg',identityPages:identityTitles.length,identities:identities.length,skills:identities.flatMap(identity=>identity.skills).length,variantSkills:identities.flatMap(identity=>identity.skills).filter(skill=>/-\d+$/.test(skill.slot)).length,passives:identities.flatMap(identity=>identity.passives).length,egoPages:egoTitles.length,egos:egos.length,awakeningSkills:egos.reduce((sum,ego)=>sum+ego.awakeningSkills.length,0),corrosionSkills:egos.reduce((sum,ego)=>sum+ego.corrosionSkills.length,0),egoPassives:egos.filter(ego=>ego.passive).length},null,2),'utf8');
   console.log(`完成：${identities.length} 个人格，${egos.length} 个 E.G.O`);
 }
-main().catch(error=>{console.error(error);process.exitCode=1;});
+if(require.main===module)main().catch(error=>{console.error(error);process.exitCode=1;});
+module.exports={validateDataVolume};
